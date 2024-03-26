@@ -103,8 +103,8 @@
    <div class="row">
     <div class="logo"><img src=".\img\logo_ugent_nl.svg"></div>
     <div class="banner">
-      <h1 class="closer">ASPIRE</h1>
-      <p class="closer" style="font-size: 80%;">Audio and Signal Processing, Interpretation, and Enhancement@IDLAB</p>
+      <h1 class="closer">ASPIRE@IDLAB</h1>
+      <p class="closer" style="font-size: 80%;">Audio and Signal Processing, Interpretation, and Enhancement</p>
     </div>
   </div>
 
@@ -113,55 +113,113 @@
 <div>
 
 <br/>
-<em>A DOA Dependent Feature Extraction for Selective Speaker Separation With a U-Net Architecture</em>
 
 <h2>Audio Samples </h2>
-<h4>VII. Application to Moving Speaker Recordings</h4>
 
-<table class="tb" border="1"id="ref" style="width:90%">
-<thead>
-<tr>
-  <th align="center">noisy microphone signal</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <td align="center">
-     <audio controls=true  style="width: 100%" src="./audio/mic_chref.wav"></audio>
-  </td>
-</tr>
-</tbody>
-</table>
-<br/>
+<p>This is the demo page for our EUSIPCO 2024 submission: <em>Spectrum-aware neural vocoder based on self-supervised learning for speech enhancement</em>.
+</p>
 
-<table class="tb" border="1"id="speaker1" style="width:90%">
-<thead>
-<tr>
-  <th align="center" style="width: 30%"></th>
-  <th align="center" style="width: 35%">oracle separation (no dereverberation or denoising)</th>
-  <th align="center" style="width: 35%">output</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <td align="center">speaker j=1</td>
-  <td align="center"><audio controls=true style="width: 100%" src="./audio/oracle_speaker1.wav"></audio></td>
-  <td align="center"><audio controls=true style="width: 100%"  src="./audio/out_speaker1.wav"></audio></td>
-</tr>
-<tr>
-  <td align="center">speaker j=2</td>
-  <td align="center"><audio controls=true style="width: 100%"  src="./audio/oracle_speaker2.wav"></audio></td>
-  <td align="center"><audio controls=true style="width: 100%"  src="./audio/out_speaker2.wav"></audio></td>
-</tr>
-<tr>
-  <td align="center">fixed target range (180°±35°)</td>
-  <td align="center"><audio controls=true style="width: 100%"  src="./audio/oracle_180deg.wav"></audio></td>
-  <td align="center"><audio controls=true style="width: 100%"  src="./audio/out_180deg.wav"></audio></td>
-</tr>
-</tbody>
-</table>
-<br/>
+<div>
+    We compare a few variations of the spectrum-aware neural vocoder on this demo page. 
+    The aim is to demonstrate the benefit of including distorted spectrum as an additional input, along with exploring the effects of different fusion techniques. Please note that certain variations, such as those conditioned by FiLM layer, have been excluded from this demonstration due to underperformance in metrics.<br/>
+    The generators presented here are as follows:
+    <ul>
+      <li><strong>Denoising vocoder</strong>: This model generates clean speech from distorted embeddings, following the approach proposed in [1];</li>
+      <li><strong>Proposed reference</strong>: The log spectrum input is conditioned by the self-supervised learning (SSL) embedding with a cross-attention block, serving as the input to the neural vocoder;</li>
+      <li><strong>+Magnitude</strong>: The linear spectrum is utilized as the input instead of the log spectrum</li>
+      <li><strong>+Conditioned by spectrum</strong>: This variation permutes the roles of spectrum and SSL embedding in the proposed referece, i.e., SSL embeddings are conditioned by log spectra as the input to the neural vocoder.</li>
+      <li><strong>Addition-fusion</strong>: Both features are combined through addition before being fed into the neural vocoder as the input.</li>
+      <li><strong>Clean embedding</strong>: This generator has access to clean embeddings but only the distorted spectrum, which makes it the <em>upper bound</em> of the proposed system;</li>
+      
+    </ul>
+</div>
+
+<div>
+    <table class="tb" id="samples">
+      <thead>
+      <tr>
+        <th>Methods</th>
+        <th>Noisy input</th>
+        <th>Denoising vocoder</th>
+        <th>Proposed reference</th>
+        <th>+Magnitude</th>
+        <th>+Conditioned by spectrum</th>
+        <th>Addition-fusion</th>
+        <th>Clean embedding</th>
+        <th>Clean reference</th>
+      </tr>
+      </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
 
 </body>
+
+<script type="text/javascript">
+  var methods = [
+'_noisy_reverb',
+'_noisy_reverb_DeVo',
+'_noisy_reverb_att+log',
+'_noisy_reverb_att+linear',
+'_noisy_reverb_embKey_att+log',
+'_noisy_reverb_add+log',
+'_noisy_reverb_att+log+ideal',
+'+clean'
+];
+
+var filenames = [
+'city1+mjmm0+snr=0dB_rt0.3',
+'street1+fjsk0+snr=0dB_rt0.8',
+'cafe2+fkdw0+snr=5dB_rt0.4', 
+'city1+fblv0+snr=5dB_rt1.1',
+'cafe2+mbbr0+snr=10dB_rt1.1',
+];
+
+var info = [
+'City, SNR=0dB, RT60=0.3s',
+'Street, SNR=0dB, RT60=0.8s',
+'Cafe, SNR=5dB, RT60=0.4s',
+'City, SNR=5dB, RT60=1.1s',
+'Cafe, SNR=10dB, RT60=1.1s',
+
+];
+
+const elementWidthSmall = '210';
+
+var tbody = document.getElementById("samples");
+for (var i in filenames) {
+    var tr = document.createElement('tr');   
+    tbody.appendChild(tr);
+    var td = document.createElement('td');
+    td.align="center";
+    td.innerHTML = info[i];
+    tr.appendChild(td);
+    for (var j in methods) {
+      var td = document.createElement('td');
+      td.width = elementWidthSmall;
+      tr.appendChild(td);
+
+      // img = document.createElement("img");
+      // img.src = './img/'+filenamesAgn[i]+methodsAgn[j]+'.png';
+      // img.method = methodsAgn[j];
+      // if (methodsAgn[j].includes("agn")){
+      //   img.onmouseover = function() {showNoisy(this)};
+      //   img.onmouseout= function() {showOriginal(this)};
+      // }
+      //   img.onclick = function () {enlargeImg(this)};
+      // img.width= elementWidthSmall;
+      // td.appendChild(img);
+
+      var audio = document.createElement("audio");
+      audio.src ='./audio/'+filenames[i]+methods[j]+'.wav';
+      audio.controls = true;
+      td.appendChild(audio);
+      audio.style.width = elementWidthSmall;
+
+    }
+    
+}
+</script>
 
 </html>
